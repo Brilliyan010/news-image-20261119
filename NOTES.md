@@ -14,7 +14,9 @@ strip, 3 large illustrated lead stories, 10 small illustrated stories,
 a world map with numbered pins, 31 numbered briefs, and a DATE CHECK
 box naming stories deliberately left out because they belong to other
 days. Every picture on the page is a geometric scene drawn in code;
-no image model was used, so no text can come out garbled.
+no image model was used, so no text can come out garbled. Rebuilt
+fresh on 20 Nov 2026 ~14:20 WIB (see "Rebuild" section below) with the
+same 44 stories and a new implementation.
 
 ## Verification (20 Nov 2026)
 
@@ -27,6 +29,40 @@ no image model was used, so no text can come out garbled.
   at 300 px.
 - Story count check: 3 leads + 10 tiles + 31 briefs = 44. Region bar
   adds up: 12 + 8 + 5 + 8 + 5 + 1 + 5 = 44.
+
+## Rebuild — fresh implementation (20 Nov 2026, ~14:20 WIB, bank only)
+
+Scheduled rebuild: `main.py` was written again from scratch in this
+session (file tools, 2 write messages + 1 fix edit) — same 44 stories
+from NOTES.md, new layout code, no copy of the old generator. The old
+render is replaced by this rebuild; nothing was submitted.
+
+- `python3 main.py entry.png` run twice: byte-identical both times.
+- `entry.png`: 1024x1024 RGB PNG, 147,928 bytes (< 1 MiB).
+- sha256: `483c68eb79eae287d6455157956a627cea55d2275b0933fa5661a5cf8ca83d1b`
+- Story count check: 3 leads + 10 tiles + 31 briefs = 44 (numbers 1-44
+  verified programmatically, no gaps/duplicates). Region bar computed
+  from the data: Asia-Pacific 13 + Europe 7 + Middle East 7 + Africa 7
+  + Americas 5 + Oceania 1 + Global 4 = 44.
+- One list fix vs the earlier summary: the old NOTES brief list merged
+  two items, so "Raisina Tokyo and the India-Japan 2+2" is now two
+  briefs (36 Raisina Dialogue opens in Tokyo; 37 India and Japan hold
+  2+2 talks) — that is what makes 31 briefs / 44 stories.
+- Two visual defects found in the first render of this rebuild and
+  fixed: (1) tile scenes painted outside their 34 px boxes and over
+  the headlines — scenes are now drawn on a clipped layer and all
+  geometry is box-relative; (2) map pins 11 (Dhaka) and 13 (Cyclone
+  Akvan) overlapped (9.2 px apart) — pin 13 shifted (+18, +14). After
+  the fix, all 13 pins are inside the map box with 0 close pairs
+  (checked numerically, min distance 20 px).
+- Viewed at full size and at ~300 px: no overlapping text, no cut-off
+  sentences; masthead and lead headlines stay legible at 300 px.
+- BANK ONLY — no bundle, no check, no submit in this run. Submit is
+  handled separately; the handoff in the section below still applies
+  (usage rows must be collected after this session ends).
+- Rebuild session: agent `25d305da-e3a3-4b51-9e23-606227f4ca27`,
+  session file
+  `/home/hatch/agents/agent-25d305da-e3a3-4b51-9e23-606227f4ca27/sessions/25d305da-e3a3-4b51-9e23-606227f4ca27.jsonl`.
 
 ## The 44 stories
 
