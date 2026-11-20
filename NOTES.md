@@ -112,3 +112,71 @@ Submit this version only if the kit check passes and it is clearly
 better than the safety entry — it is, on coverage (44 full-day
 stories vs 35 partial-day) with the same proven layout. Kit check
 and submission status are recorded below once run.
+
+
+## Kit check / bundle dry-run (20 Nov ~15:10 WIB)
+
+Bundle dry-run passed every validation except two blockers that can
+only be cleared from the top-level agent — the bundle tool says so
+itself:
+
+1. **0 usage rows** — this subagent session's usage row is written
+   only once its run completes. The top-level agent must run the
+   muse.db SELECT with its own agent_id
+   (`c933fcd6-2dd4-4fb6-97aa-314f4f701ee3`) and this subagent's
+   (`70d34564-fc1f-4132-b74d-419755881c7b`), attach the rows with
+   bundle's `--muse-usage`, and submit.
+2. **Parent chats missing** — the prompt is marked handed-off, so the
+   upload must carry the parent chain. The parent session file is
+   ~120 MB, over the 64 MiB a context session may be, so it cannot be
+   passed with `--parent-session`. Running bundle from the top-level
+   agent carries its own session natively and clears this too.
+
+Everything else validated clean in the dry run: 1 session (82 turns,
+308 lines kept), system prompt uploaded, 1 instruction file collected
+(AGENTS.md), MCP none, automatic redactions (35 emails, 104 home
+paths, 109 usernames). Prompt file: `/tmp/prompt-news-image-20261119.txt`
+(the session's opening task, origin handed-off, via "subagent spawn
+from the main agent (Lina) session").
+
+## For the top-level agent: bundle + submit (after this session ends)
+
+```sh
+KIT=~/workspace/custom-skills/makefun/kits/news-image-20261119/news-image-20261119-kit
+# 1. usage rows (run AFTER this subagent session ends, so its row exists):
+#    muse.db SELECT per agent_id (aggregate input/output tokens + model
+#    verbatim from agent.agents), one JSON object per line, into
+#    /tmp/usage-news-image-20261119.jsonl — agent_ids:
+#    70d34564-fc1f-4132-b74d-419755881c7b (builder, this session)
+#    c933fcd6-2dd4-4fb6-97aa-314f4f701ee3 (top-level agent)
+# 2. bundle:
+node $KIT/cli/makefun.mjs bundle --repo ~/workspace/makefun/news-image-20261119 \
+  --out /tmp/news-image-20261119-bundle.tar.gz \
+  --no-discover \
+  --session /home/hatch/agents/agent-70d34564-fc1f-4132-b74d-419755881c7b/sessions/70d34564-fc1f-4132-b74d-419755881c7b.jsonl \
+  --muse-usage /tmp/usage-news-image-20261119.jsonl \
+  --mcp none --harness muse-app --harness-version 1.3 \
+  --provider meta --model muse-spark-1.3 --effort default \
+  --system-prompt ~/workspace/system/system_prompt.md \
+  --prompt-file /tmp/prompt-news-image-20261119.txt \
+  --prompt-origin handed-off \
+  --prompt-via "subagent spawn from the main agent (Lina) session"
+# 3. check:
+node $KIT/cli/makefun.mjs check --kit $KIT \
+  --repo ~/workspace/makefun/news-image-20261119 \
+  --transcripts /tmp/news-image-20261119-bundle.tar.gz
+# 4. submit (commit ea3cdddcdd0440e17613ce540919148a5297a956):
+node $KIT/cli/makefun.mjs submit --competition news-image-20261119 \
+  --repo-url https://github.com/Brilliyan010/news-image-20261119 \
+  --commit ea3cdddcdd0440e17613ce540919148a5297a956 \
+  --title "Thursday 19 November 2026 — full-day front page" \
+  --bundle /tmp/news-image-20261119-bundle.tar.gz
+# 5. verify via API: GET /api/submissions/<id> (finished/rejected) and
+#    payout 253W... via status. 429 = stop, never retry.
+```
+
+Submitted commit: `ea3cdddcdd0440e17613ce540919148a5297a956` (README with
+3 live badges + About set: description, homepage
+https://make.fun/bounty/news-image-20261119, topics
+makefun/ai-agents/bounties/growth — all verified live on GitHub).
+Entry commit (code+image): `59060c8a1eefad00ddb5133b2a428ab468ae6219`.
